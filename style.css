@@ -1,75 +1,83 @@
-/* Style général du site */
-body {
-    font-family: 'Poppins', sans-serif;
-    text-align: center;
-    margin-top: 50px;
-    background: linear-gradient(to right, #141E30, #243B55);
-    color: white;
-}
+    body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            overflow: hidden;
+            position: relative;
+        }
+        #counter {
+            font-size: 48px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            z-index: 10;
+        }
+        #timer {
+            font-size: 24px;
+            color: #fff;
+            margin-bottom: 20px;
+            z-index: 10;
+        }
+        #incrementBtn {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #ff6f61;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.2s;
+            z-index: 10;
+        }
+        #incrementBtn:hover {
+            background-color: #ff4f41;
+            transform: scale(1.1);
+        }
+        #incrementBtn:active {
+            transform: scale(0.95);
+        }
+        #incrementBtn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .pulse {
+            animation: pulse 0.3s ease;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .shape {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: moveShape 2s ease-out forwards;
+        }
+        @keyframes moveShape {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2) translateY(-100vh);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
 
-/* Conteneur du jeu */
-.container {
-    max-width: 500px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
-    margin: auto;
-    margin-top: 50px;
-}
-
-/* Titre */
-h1 {
-    font-size: 28px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-/* Boutons stylés */
-button {
-    font-size: 22px;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-/* Effet hover sur les boutons */
-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
-}
-
-/* Styles spécifiques aux boutons */
-#button-clicker {
-    background: #27ae60;
-    color: white;
-}
-
-#button-clicker:hover {
-    background: #2ecc71;
-}
-
-#button-reset {
-    background: #e74c3c;
-    color: white;
-}
-
-#button-reset:hover {
-    background: #c0392b;
-}
-
-/* Score et chrono */
-p {
-    font-size: 20px;
-    margin-top: 15px;
-}
-
-#score, #timer {
-    font-size: 24px;
-    font-weight: bold;
-    color: #f1c40f;
-}
+    <script>
+       

@@ -1,0 +1,29 @@
+{
+  "name": "clickfast",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "npx jest --env=jsdom"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/najiba93/clickFast2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/najiba93/clickFast2/issues"
+  },
+  "homepage": "https://github.com/najiba93/clickFast2#readme",
+  "devDependencies": {
+    "jest": "^30.0.0",
+    "jest-environment-jsdom": "^30.0.0",
+    "jsdom": "^26.1.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
+  }
+}
