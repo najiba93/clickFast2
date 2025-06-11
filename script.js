@@ -139,29 +139,39 @@ function displayScores(scores) {
 }
 
 function resetGame() {
-    count = 0;
-    timeLeft = 5;
-    timerRunning = false;
-    counterDisplay.textContent = count;
-    timerDisplay.textContent = `Temps restant : ${timeLeft}s`;
-    button.disabled = false;
-    scoreboard.style.display = "none";
-    console.log('Game reset');
+    console.log('resetGame called');
+    try {
+        count = 0;
+        timeLeft = 5;
+        timerRunning = false;
+        counterDisplay.textContent = count;
+        timerDisplay.textContent = `Temps restant : ${timeLeft}s`;
+        button.disabled = false;
+        scoreboard.style.display = 'none';
+        console.log('Game reset successfully');
+    } catch (error) {
+        console.error('Error resetting game:', error);
+    }
 }
 
-button.addEventListener('click', () => {
-    if (!usernameInput.value.trim()) {
-        alert("Veuillez entrer un pseudo !");
-        return;
-    }
-    startTimer();
-    if (timeLeft > 0) {
-        updateCounter();
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, attaching event listeners');
+    if (!button) console.error('incrementBtn not found');
+    if (!scoreboardBtn) console.error('scoreboardBtn not found');
+    if (!resetBtn) console.error('resetBtn not found');
+    button.addEventListener('click', () => {
+        if (!usernameInput.value.trim()) {
+            alert("Veuillez entrer un pseudo !");
+            return;
+        }
+        startTimer();
+        if (timeLeft > 0) {
+            updateCounter();
+        }
+    });
+    scoreboardBtn.addEventListener('click', () => {
+        console.log('Scoreboard button clicked');
+        getScores();
+    });
+    resetBtn.addEventListener('click', resetGame);
 });
-
-scoreboardBtn.addEventListener('click', () => {
-    console.log('Scoreboard button clicked');
-    getScores();
-});
-resetBtn.addEventListener('click', resetGame);
