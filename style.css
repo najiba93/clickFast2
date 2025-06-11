@@ -1,0 +1,75 @@
+/* Style général du site */
+body {
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    margin-top: 50px;
+    background: linear-gradient(to right, #141E30, #243B55);
+    color: white;
+}
+
+/* Conteneur du jeu */
+.container {
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
+    margin: auto;
+    margin-top: 50px;
+}
+
+/* Titre */
+h1 {
+    font-size: 28px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Boutons stylés */
+button {
+    font-size: 22px;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* Effet hover sur les boutons */
+button:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Styles spécifiques aux boutons */
+#button-clicker {
+    background: #27ae60;
+    color: white;
+}
+
+#button-clicker:hover {
+    background: #2ecc71;
+}
+
+#button-reset {
+    background: #e74c3c;
+    color: white;
+}
+
+#button-reset:hover {
+    background: #c0392b;
+}
+
+/* Score et chrono */
+p {
+    font-size: 20px;
+    margin-top: 15px;
+}
+
+#score, #timer {
+    font-size: 24px;
+    font-weight: bold;
+    color: #f1c40f;
+}
