@@ -336,6 +336,32 @@ body {
     margin-bottom: 20px;
 }
 
+/* Animations des formes */
+.animated-shape {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+    animation: moveUp 2s linear forwards;
+}
+
+@keyframes moveUp {
+    0% { 
+        transform: translateY(0) scale(0.5) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-50vh) scale(1) rotate(180deg);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: translateY(-100vh) scale(0.3) rotate(360deg);
+        opacity: 0;
+    }
+}
+
 /* Animations */
 @keyframes fadeInDown {
     from {

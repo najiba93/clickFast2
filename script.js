@@ -19,6 +19,40 @@ const elements = {
     playersHistory: document.getElementById('playersHistory')
 };
 
+// Fonction pour obtenir des couleurs aléatoires
+function getRandomColor() {
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F39C12', '#E74C3C', '#9B59B6'];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+// Fonction pour créer des formes animées
+function createShape() {
+    const shape = document.createElement('div');
+    shape.classList.add('animated-shape');
+    shape.style.cssText = `
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        position: fixed;
+        background-color: ${getRandomColor()};
+        left: ${Math.random() * (window.innerWidth - 30)}px;
+        top: ${window.innerHeight - 50}px;
+        pointer-events: none;
+        z-index: 1000;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        animation: moveUp 2s linear forwards;
+    `;
+    
+    document.body.appendChild(shape);
+    
+    // Supprimer la forme après l'animation
+    setTimeout(() => {
+        if (shape.parentNode) {
+            shape.remove();
+        }
+    }, 2000);
+}
+
 // Fonction pour mettre à jour le compteur
 function updateCounter() {
     if (!gameStarted) return;
@@ -27,6 +61,9 @@ function updateCounter() {
     elements.counterDisplay.textContent = count;
     elements.counterDisplay.classList.add('pulse');
     setTimeout(() => elements.counterDisplay.classList.remove('pulse'), 600);
+    
+    // Créer une forme animée à chaque clic
+    createShape();
 }
 
 // Fonction pour démarrer le timer
