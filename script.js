@@ -5,8 +5,8 @@ let timerRunning = false;
 let gameStarted = false;
 let timerInterval = null;
 
-// Liste fictive de joueurs en ligne (pour tests sans API)
-const joueursEnLigne = ['Joueur1', 'Joueur2', 'Joueur3', 'Joueur4', 'Joueur5'];
+// Tableau en mémoire pour stocker les pseudos des joueurs ayant joué (pas de localStorage)
+let playedUsers = [];
 
 // Éléments du DOM
 const elements = {
@@ -192,30 +192,57 @@ function endGame() {
     }
     
     showNotification(message, 'success');
-}
-
-// Fonction pour récupérer les joueurs en ligne via une API (simulation)
-async function fetchOnlinePlayers() {
-    try {
-        // Simulation d'une requête API (remplacez par votre URL réelle)
-        // Exemple : const response = await fetch('https://votre-api.com/joueurs');
-        // const data = await response.json();
-        // return data.map(player => player.username);
-
-        // Simulation avec un délai pour imiter une requête réseau
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve(joueursEnLigne); // Liste fictive
-            }, 1000);
-        });
-    } catch (error) {
-        showNotification('⚠️ Erreur lors de la récupération des joueurs en ligne', 'error');
-        console.error('Erreur API :', error);
-        return joueursEnLigne; // Liste de secours
+    
+    // Ajouter le pseudo à la liste en mémoire et envoyer à l'API
+    const username = elements.usernameInput.value.trim();
+    if (!playedUsers.includes(username)) {
+        playedUsers.push(username);
+        savePlayerToAPI(username); // Simuler l'envoi à l'API
     }
 }
 
-// Fonction pour afficher les joueurs en ligne
+// Fonction pour simuler l'enregistrement d'un joueur via une API
+async function savePlayerToAPI(username) {
+    try {
+        // Simulation d'une requête POST à une API
+        // Exemple réel : 
+        // const response = await fetch('https://votre-api.com/joueurs', {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify({ username })
+        // });
+        // if (!response.ok) throw new Error('Erreur réseau');
+
+        console.log(`Joueur ${username} enregistré via l'API (simulation)`);
+        return { success: true };
+    } catch (error) {
+        console.error('Erreur lors de l\'enregistrement du joueur :', error);
+        return { success: false };
+    }
+}
+
+// Fonction pour récupérer les joueurs ayant joué via une API (simulation)
+async function fetchOnlinePlayers() {
+    try {
+        // Simulation d'une requête GET à une API
+        // Exemple réel :
+        // const response = await fetch('https://votre-api.com/joueurs');
+        // const data = await response.json();
+        // return data.map(player => player.username);
+
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve([...playedUsers]); // Renvoie les pseudos en mémoire
+            }, 1000);
+        });
+    } catch (error) {
+        showNotification('⚠️ Erreur lors de la récupération des joueurs', 'error');
+        console.error('Erreur API :', error);
+        return playedUsers; // Liste de secours
+    }
+}
+
+// Fonction pour afficher les joueurs ayant joué
 async function showPlayersHistory() {
     elements.playersHistory.style.display = 'block';
     elements.scoreboard.style.display = 'none';
@@ -224,8 +251,8 @@ async function showPlayersHistory() {
     
     if (players.length === 0) {
         elements.playersHistory.innerHTML = `
-            <h2>👥 Joueurs en ligne</h2>
-            <p>Aucun joueur en ligne.</p>
+            <h2>👥 Joueurs ayant joué</h2>
+            <p>Aucun joueur n'a encore joué.</p>
         `;
         return;
     }
@@ -235,14 +262,14 @@ async function showPlayersHistory() {
         return `
             <li>
                 <strong>${trophy} ${player}</strong><br>
-                📅 Connecté le ${new Date().toLocaleDateString('fr-FR')}
+                📅 Joué le ${new Date().toLocaleDateString('fr-FR')}
             </li>
         `;
     }).join('');
 
     elements.playersHistory.innerHTML = `
-        <h2>👥 Joueurs en ligne</h2>
-        <p>🎮 ${players.length} joueur${players.length > 1 ? 's' : ''} en ligne</p>
+        <h2>👥 Joueurs ayant joué</h2>
+        <p>🎮 ${players.length} joueur${players.length > 1 ? 's' : ''} ayant joué</p>
         <ul>${playersList}</ul>
     `;
 }
@@ -305,7 +332,7 @@ elements.incrementBtn.addEventListener('contextmenu', (e) => {
 function initGame() {
     elements.incrementBtn.disabled = true;
     showNotification('🎮 Bienvenue dans ClickFast !\nEntrez votre pseudo et commencez le défi !', 'info');
-    console.log('Joueurs en ligne (initialisation) :', joueursEnLigne.join(', '));
+    console.log('Initialisation : liste des joueurs en mémoire vide');
     clearLocalStorage(); // Effacer les données résiduelles
 }
 
