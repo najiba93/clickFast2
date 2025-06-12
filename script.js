@@ -204,22 +204,25 @@ function endGame() {
 // Fonction pour simuler l'enregistrement d'un joueur via une API
 async function savePlayerToAPI(username) {
     try {
-        // Simulation d'une requête POST à une API
-        // Exemple réel : 
-        // const response = await fetch('https://votre-api.com/joueurs', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({ username })
-        // });
-        // if (!response.ok) throw new Error('Erreur réseau');
+        const response = await fetch('https://ton-api.com/joueurs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username })
+        });
 
-        console.log(`Joueur ${username} enregistré via l'API (simulation)`);
+        if (!response.ok) throw new Error('Erreur réseau');
+
+        console.log(`✅ Joueur ${username} enregistré avec succès`);
         return { success: true };
     } catch (error) {
-        console.error('Erreur lors de l\'enregistrement du joueur :', error);
+        console.error('❌ Erreur lors de l\'enregistrement du joueur :', error);
+        showNotification("Erreur lors de l'envoi à l'API", 'error');
         return { success: false };
     }
 }
+
 
 // Fonction pour récupérer les joueurs ayant joué via une API (simulation)
 async function fetchOnlinePlayers() {
