@@ -3,17 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClickFast</title>
+    <title>ClickFast - Le Jeu de Rapidité</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <input type="text" id="username" placeholder="Entrez votre pseudo">
-    <div id="counter">0</div>
-    <div id="timer">Temps restant : 5s</div>
-    <button id="incrementBtn">Incrémenter</button>
-    <button id="scoreboardBtn">Voir le Scoreboard</button>
-    <button id="resetBtn">Rejouer</button>
-    <div id="scoreboard" style="display: none;"></div>
+    <div class="container">
+        <header class="game-header">
+            <h1 class="game-title"> ClickFast </h1>
+            <p class="game-subtitle">Le défi ultime de rapidité !</p>
+            
+            <div class="instructions">
+                <h3>📋 Comment jouer ?</h3>
+                <div class="instruction-list">
+                    <div class="instruction-item">
+                        <span class="step">1</span>
+                        <p>Entrez votre pseudo dans le champ ci-dessous</p>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="step">2</span>
+                        <p>Cliquez sur "Commencer le défi" pour démarrer</p>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="step">3</span>
+                        <p>Cliquez le plus vite possible sur "Cliquer !"</p>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="step">4</span>
+                        <p>Battez votre record et défiez vos amis !</p>
+                    </div>
+                </div>
+                <p class="objective"> <strong>Objectif :</strong> Cliquez le plus rapidement possible en 5 secondes</p>
+            </div>
+        </header>
+
+        <main class="game-container">
+            <div class="game-area">
+                <input type="text" id="username" placeholder="🎮 Entrez votre pseudo">
+                <div class="game-display">
+                    <div id="counter" class="counter">0</div>
+                    <div id="timer" class="timer">Temps restant : 5s</div>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" id="incrementBtn">🖱️ Cliquer !</button>
+                    <button class="btn btn-success" id="startBtn">🚀 Commencer le défi</button>
+                </div>
+                <div class="button-group secondary">
+                    <button class="btn btn-secondary" id="resetBtn">🔄 Nouvelle partie</button>
+                    <button class="btn btn-info" id="scoreboardBtn">🏆 Classement</button>
+                    <button class="btn btn-warning" id="playersBtn">👥 Historique</button>
+                </div>
+            </div>
+        </main>
+
+        <div class="stats-container">
+            <div id="scoreboard" class="stats-panel" style="display: none;"></div>
+            <div id="playersHistory" class="stats-panel" style="display: none;"></div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
