@@ -22,6 +22,12 @@ const elements = {
     playersHistory: document.getElementById('playersHistory')
 };
 
+// Effacer localStorage au démarrage pour supprimer les données résiduelles
+function clearLocalStorage() {
+    localStorage.removeItem('clickfast_scores');
+    localStorage.removeItem('clickfast_players');
+}
+
 // Fonction pour obtenir des couleurs aléatoires
 function getRandomColor() {
     const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F39C12', '#E74C3C', '#9B59B6'];
@@ -194,18 +200,18 @@ async function fetchOnlinePlayers() {
         // Simulation d'une requête API (remplacez par votre URL réelle)
         // Exemple : const response = await fetch('https://votre-api.com/joueurs');
         // const data = await response.json();
-        // return data.map(player => player.username); // Ajustez selon le format de l'API
+        // return data.map(player => player.username);
 
         // Simulation avec un délai pour imiter une requête réseau
         return new Promise(resolve => {
             setTimeout(() => {
-                resolve(joueursEnLigne); // Retourne la liste fictive pour les tests
+                resolve(joueursEnLigne); // Liste fictive
             }, 1000);
         });
     } catch (error) {
         showNotification('⚠️ Erreur lors de la récupération des joueurs en ligne', 'error');
         console.error('Erreur API :', error);
-        return joueursEnLigne; // Retourne la liste fictive en cas d'erreur
+        return joueursEnLigne; // Liste de secours
     }
 }
 
@@ -241,7 +247,7 @@ async function showPlayersHistory() {
     `;
 }
 
-// Fonction pour afficher le classement (désactivée car pas d'historique)
+// Fonction pour afficher le classement (désactivée)
 function showScoreboard() {
     elements.scoreboard.style.display = 'block';
     elements.playersHistory.style.display = 'none';
@@ -300,6 +306,7 @@ function initGame() {
     elements.incrementBtn.disabled = true;
     showNotification('🎮 Bienvenue dans ClickFast !\nEntrez votre pseudo et commencez le défi !', 'info');
     console.log('Joueurs en ligne (initialisation) :', joueursEnLigne.join(', '));
+    clearLocalStorage(); // Effacer les données résiduelles
 }
 
 initGame();
