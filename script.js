@@ -5,6 +5,9 @@ let timerRunning = false;
 let gameStarted = false;
 let timerInterval = null;
 
+// Liste fictive de joueurs en ligne (pour tests sans API)
+const joueursEnLigne = ['Joueur1', 'Joueur2', 'Joueur3', 'Joueur4', 'Joueur5'];
+
 // Éléments du DOM
 const elements = {
     counterDisplay: document.getElementById('counter'),
@@ -45,12 +48,65 @@ function createShape() {
     
     document.body.appendChild(shape);
     
-    // Supprimer la forme après l'animation
     setTimeout(() => {
         if (shape.parentNode) {
             shape.remove();
         }
     }, 2000);
+}
+
+// Fonction pour afficher des notifications
+function showNotification(message, type = 'info') {
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notif => notif.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        z-index: 1000;
+        max-width: 350px;
+        word-wrap: break-word;
+        white-space: pre-line;
+        animation: slideIn 0.3s ease-out;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    `;
+    
+    const colors = {
+        success: 'background: rgba(16, 185, 129, 0.9);',
+        warning: 'background: rgba(245, 158, 11, 0.9);',
+        error: 'background: rgba(239, 68, 68, 0.9);',
+        info: 'background: rgba(59, 130, 246, 0.9);'
+    };
+    
+    notification.style.cssText += colors[type] || colors.info;
+    notification.textContent = message;
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-out forwards';
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
 }
 
 // Fonction pour mettre à jour le compteur
@@ -62,7 +118,6 @@ function updateCounter() {
     elements.counterDisplay.classList.add('pulse');
     setTimeout(() => elements.counterDisplay.classList.remove('pulse'), 600);
     
-    // Créer une forme animée à chaque clic
     createShape();
 }
 
@@ -88,16 +143,15 @@ function startTimer() {
     elements.startBtn.disabled = true;
     elements.usernameInput.disabled = true;
     
-    // Réinitialiser le compteur et le timer
     count = 0;
     timeLeft = 5;
     elements.counterDisplay.textContent = count;
+    elements.timerDisplay.textContent = `Objectif : Cliquez le plus rapidement possible en 5 secondes !\nTemps restant : ${timeLeft}s`;
     
     timerInterval = setInterval(() => {
         timeLeft--;
-        elements.timerDisplay.textContent = `Temps restant : ${timeLeft}s`;
+        elements.timerDisplay.textContent = `Objectif : Cliquez le plus rapidement possible en 5 secondes !\nTemps restant : ${timeLeft}s`;
         
-        // Changer la couleur quand il reste peu de temps
         if (timeLeft <= 2) {
             elements.timerDisplay.style.color = '#ef4444';
         } else if (timeLeft <= 3) {
@@ -116,194 +170,84 @@ function endGame() {
     gameStarted = false;
     timerRunning = false;
     elements.incrementBtn.disabled = true;
-    elements.timerDisplay.textContent = "🎉 Temps écoulé !";
+    const cps = (count / 5).toFixed(2);
+    elements.timerDisplay.textContent = `🎉 Temps écoulé ! Votre score : ${cps} CPS`;
     elements.timerDisplay.style.color = '#10b981';
     
-    postScore();
-    
-    // Message de fin personnalisé
-    setTimeout(() => {
-        let message = `🎯 Bravo ! Vous avez cliqué ${count} fois en 5 secondes !`;
-        
-        if (count >= 50) {
-            message += '\n🔥 Performance exceptionnelle !';
-        } else if (count >= 30) {
-            message += '\n⚡ Très bon score !';
-        } else if (count >= 20) {
-            message += '\n👍 Bon travail !';
-        } else {
-            message += '\n💪 Vous pouvez faire mieux !';
-        }
-        
-        showNotification(message, 'success');
-    }, 100);
-}
-
-// Fonction pour récupérer les scores depuis localStorage
-function fetchScores() {
-    const scores = localStorage.getItem('clickfast_scores');
-    return scores ? JSON.parse(scores) : [];
-}
-
-// Fonction pour récupérer tous les joueurs
-function fetchAllPlayers() {
-    const players = localStorage.getItem('clickfast_players');
-    return players ? JSON.parse(players) : [];
-}
-
-// Fonction pour enregistrer un joueur dans l'historique
-function savePlayerToHistory(username) {
-    let players = fetchAllPlayers();
-    
-    // Vérifier si le joueur existe déjà
-    const existingPlayerIndex = players.findIndex(player => 
-        player.username.toLowerCase() === username.toLowerCase()
-    );
-    
-    if (existingPlayerIndex === -1) {
-        // Nouveau joueur
-        const newPlayer = {
-            username: username,
-            firstPlayed: new Date().toISOString(),
-            totalGames: 1,
-            bestScore: count
-        };
-        players.push(newPlayer);
+    let message = `🎯 Bravo ${elements.usernameInput.value} ! Vous avez cliqué ${count} fois en 5 secondes (${cps} CPS) !`;
+    if (count >= 50) {
+        message += '\n🔥 Performance exceptionnelle !';
+    } else if (count >= 30) {
+        message += '\n⚡ Très bon score !';
+    } else if (count >= 20) {
+        message += '\n👍 Bon travail !';
     } else {
-        // Joueur existant
-        players[existingPlayerIndex].totalGames += 1;
-        players[existingPlayerIndex].lastPlayed = new Date().toISOString();
-        
-        // Mettre à jour le meilleur score si nécessaire
-        if (count > players[existingPlayerIndex].bestScore) {
-            players[existingPlayerIndex].bestScore = count;
-        }
+        message += '\n💪 Vous pouvez faire mieux !';
     }
     
-    localStorage.setItem('clickfast_players', JSON.stringify(players));
+    showNotification(message, 'success');
 }
 
-// Fonction pour enregistrer le score
-function postScore() {
-    const username = elements.usernameInput.value.trim();
-    let scores = fetchScores();
+// Fonction pour récupérer les joueurs en ligne via une API (simulation)
+async function fetchOnlinePlayers() {
+    try {
+        // Simulation d'une requête API (remplacez par votre URL réelle)
+        // Exemple : const response = await fetch('https://votre-api.com/joueurs');
+        // const data = await response.json();
+        // return data.map(player => player.username); // Ajustez selon le format de l'API
 
-    const newScore = { 
-        username, 
-        score: count, 
-        date: new Date().toISOString(),
-        timestamp: Date.now()
-    };
-
-    // Enregistrer le joueur dans l'historique
-    savePlayerToHistory(username);
-
-    const existingScoreIndex = scores.findIndex(score => 
-        score.username.toLowerCase() === username.toLowerCase()
-    );
-
-    if (existingScoreIndex !== -1) {
-        // Joueur existant
-        const oldScore = scores[existingScoreIndex].score;
-        if (count > oldScore) {
-            scores[existingScoreIndex] = newScore;
-            showNotification(`🎊 Nouveau record personnel !\nAncien record : ${oldScore} clics\nNouveau record : ${count} clics`, 'success');
-        } else {
-            showNotification(`Votre record reste ${oldScore} clics`, 'info');
-        }
-    } else {
-        // Nouveau joueur
-        scores.push(newScore);
-        showNotification(`🎉 Bienvenue ${username} !\nPremier score : ${count} clics`, 'success');
+        // Simulation avec un délai pour imiter une requête réseau
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve(joueursEnLigne); // Retourne la liste fictive pour les tests
+            }, 1000);
+        });
+    } catch (error) {
+        showNotification('⚠️ Erreur lors de la récupération des joueurs en ligne', 'error');
+        console.error('Erreur API :', error);
+        return joueursEnLigne; // Retourne la liste fictive en cas d'erreur
     }
-
-    // Trier les scores par ordre décroissant
-    scores.sort((a, b) => b.score - a.score);
-    localStorage.setItem('clickfast_scores', JSON.stringify(scores));
 }
 
-// Fonction pour afficher le classement
-function showScoreboard() {
-    const scores = fetchScores();
-    elements.scoreboard.style.display = "block";
-    elements.playersHistory.style.display = "none";
+// Fonction pour afficher les joueurs en ligne
+async function showPlayersHistory() {
+    elements.playersHistory.style.display = 'block';
+    elements.scoreboard.style.display = 'none';
 
-    if (scores.length === 0) {
-        elements.scoreboard.innerHTML = `
-            <h2>🏆 Classement</h2>
-            <p>Aucun score disponible.<br>Soyez le premier à jouer !</p>
+    const players = await fetchOnlinePlayers();
+    
+    if (players.length === 0) {
+        elements.playersHistory.innerHTML = `
+            <h2>👥 Joueurs en ligne</h2>
+            <p>Aucun joueur en ligne.</p>
         `;
         return;
     }
 
-    const top10 = scores.slice(0, 10);
-    const scoresList = top10.map((score, index) => {
-        const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
-        const date = new Date(score.date).toLocaleDateString('fr-FR');
-        const time = new Date(score.date).toLocaleTimeString('fr-FR', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-        
+    const playersList = players.map((player, index) => {
+        const trophy = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🎮';
         return `
             <li>
-                <strong>${medal} ${score.username}</strong><br>
-                🎯 ${score.score} clics<br>
-                📅 ${date} à ${time}
+                <strong>${trophy} ${player}</strong><br>
+                📅 Connecté le ${new Date().toLocaleDateString('fr-FR')}
             </li>
         `;
     }).join('');
 
-    elements.scoreboard.innerHTML = `
-        <h2>🏆 Top 10 - Classement</h2>
-        <p>🎮 ${scores.length} score${scores.length > 1 ? 's' : ''} enregistré${scores.length > 1 ? 's' : ''}</p>
-        <ul>${scoresList}</ul>
+    elements.playersHistory.innerHTML = `
+        <h2>👥 Joueurs en ligne</h2>
+        <p>🎮 ${players.length} joueur${players.length > 1 ? 's' : ''} en ligne</p>
+        <ul>${playersList}</ul>
     `;
 }
 
-// Fonction pour afficher l'historique des joueurs
-function showPlayersHistory() {
-    const players = fetchAllPlayers();
-    elements.playersHistory.style.display = "block";
-    elements.scoreboard.style.display = "none";
-
-    if (players.length === 0) {
-        elements.playersHistory.innerHTML = `
-            <h2>👥 Historique des Joueurs</h2>
-            <p>Aucun joueur enregistré.</p>
-        `;
-        return;
-    }
-
-    // Trier par meilleur score (décroissant)
-    players.sort((a, b) => b.bestScore - a.bestScore);
-
-    const playersList = players.map((player, index) => {
-        const firstPlayed = new Date(player.firstPlayed).toLocaleDateString('fr-FR');
-        const lastPlayed = player.lastPlayed ? 
-            new Date(player.lastPlayed).toLocaleDateString('fr-FR') : 
-            firstPlayed;
-        
-        const trophy = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🎮';
-        
-        return `
-            <li>
-                <strong>${trophy} ${player.username}</strong><br>
-                🏆 Meilleur score : ${player.bestScore} clics<br>
-                📊 ${player.totalGames} partie${player.totalGames > 1 ? 's' : ''}<br>
-                📅 Première fois : ${firstPlayed}
-                ${player.lastPlayed ? `<br>🕐 Dernière fois : ${lastPlayed}` : ''}
-            </li>
-        `;
-    }).join('');
-
-    const totalGames = players.reduce((sum, player) => sum + player.totalGames, 0);
-
-    elements.playersHistory.innerHTML = `
-        <h2>👥 Historique des Joueurs</h2>
-        <p>📈 ${players.length} joueur${players.length > 1 ? 's' : ''} unique${players.length > 1 ? 's' : ''}<br>
-        🎮 ${totalGames} partie${totalGames > 1 ? 's' : ''} jouée${totalGames > 1 ? 's' : ''}</p>
-        <ul>${playersList}</ul>
+// Fonction pour afficher le classement (désactivée car pas d'historique)
+function showScoreboard() {
+    elements.scoreboard.style.display = 'block';
+    elements.playersHistory.style.display = 'none';
+    elements.scoreboard.innerHTML = `
+        <h2>🏆 Classement</h2>
+        <p>Le classement n'est pas disponible (aucun historique enregistré).</p>
     `;
 }
 
@@ -327,75 +271,6 @@ function resetGame() {
     showNotification('🔄 Nouvelle partie prête !', 'info');
 }
 
-// Fonction pour afficher des notifications
-function showNotification(message, type = 'info') {
-    // Supprimer les notifications existantes
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notif => notif.remove());
-    
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 10px;
-        color: white;
-        font-weight: 600;
-        z-index: 1000;
-        max-width: 350px;
-        word-wrap: break-word;
-        white-space: pre-line;
-        animation: slideIn 0.3s ease-out;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    `;
-    
-    // Couleurs selon le type
-    const colors = {
-        success: 'background: rgba(16, 185, 129, 0.9);',
-        warning: 'background: rgba(245, 158, 11, 0.9);',
-        error: 'background: rgba(239, 68, 68, 0.9);',
-        info: 'background: rgba(59, 130, 246, 0.9);'
-    };
-    
-    notification.style.cssText += colors[type] || colors.info;
-    notification.textContent = message;
-    
-    // Ajouter l'animation CSS
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-    
-    document.body.appendChild(notification);
-    
-    // Supprimer après 4 secondes
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease-out forwards';
-        notification.style.cssText += `
-            @keyframes slideOut {
-                to {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-            }
-        `;
-        setTimeout(() => notification.remove(), 300);
-    }, 4000);
-}
-
 // Event listeners
 elements.incrementBtn.addEventListener('click', updateCounter);
 elements.startBtn.addEventListener('click', startTimer);
@@ -403,14 +278,12 @@ elements.scoreboardBtn.addEventListener('click', showScoreboard);
 elements.playersBtn.addEventListener('click', showPlayersHistory);
 elements.resetBtn.addEventListener('click', resetGame);
 
-// Permettre de commencer avec la touche Entrée
 elements.usernameInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && !timerRunning) {
         startTimer();
     }
 });
 
-// Permettre de cliquer avec la barre d'espace quand le jeu est actif
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && gameStarted && !elements.incrementBtn.disabled) {
         e.preventDefault();
@@ -418,7 +291,6 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Empêcher le clic droit sur le bouton de jeu pour éviter la triche
 elements.incrementBtn.addEventListener('contextmenu', (e) => {
     e.preventDefault();
 });
@@ -427,58 +299,7 @@ elements.incrementBtn.addEventListener('contextmenu', (e) => {
 function initGame() {
     elements.incrementBtn.disabled = true;
     showNotification('🎮 Bienvenue dans ClickFast !\nEntrez votre pseudo et commencez le défi !', 'info');
+    console.log('Joueurs en ligne (initialisation) :', joueursEnLigne.join(', '));
 }
 
-// Fonction pour nettoyer les données (utile pour le développement)
-function clearAllData() {
-    if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer toutes les données ?\nCette action est irréversible !')) {
-        localStorage.removeItem('clickfast_scores');
-        localStorage.removeItem('clickfast_players');
-        showNotification('🗑️ Toutes les données ont été supprimées !', 'warning');
-        
-        // Masquer les panneaux s'ils sont ouverts
-        elements.scoreboard.style.display = 'none';
-        elements.playersHistory.style.display = 'none';
-    }
-}
-
-// Fonction pour exporter les données
-function exportData() {
-    const scores = fetchScores();
-    const players = fetchAllPlayers();
-    
-    const data = {
-        scores: scores,
-        players: players,
-        exportDate: new Date().toISOString(),
-        version: '1.0'
-    };
-    
-    const dataStr = JSON.stringify(data, null, 2);
-    const dataBlob = new Blob([dataStr], {type: 'application/json'});
-    const url = URL.createObjectURL(dataBlob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `clickfast-data-${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    
-    URL.revokeObjectURL(url);
-    showNotification('📁 Données exportées avec succès !', 'success');
-}
-
-// Ajouter des raccourcis clavier pour les développeurs (mode debug)
-document.addEventListener('keydown', (e) => {
-    // Ctrl + Alt + C = Clear data
-    if (e.ctrlKey && e.altKey && e.key === 'c') {
-        clearAllData();
-    }
-    
-    // Ctrl + Alt + E = Export data
-    if (e.ctrlKey && e.altKey && e.key === 'e') {
-        exportData();
-    }
-});
-
-// Démarrer le jeu
 initGame();
